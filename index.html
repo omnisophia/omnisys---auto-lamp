@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorized ASCII Art with TV Static Background</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: black; /* Fallback background */
+            color: white;
+            font-family: 'Courier New', monospace; /* Monospace font for ASCII art */
+            white-space: pre; /* Preserve whitespace */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center; /* Center the text */
+        }
+        #staticCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #asciiArt {
+            position: relative;
+            z-index: 1; /* Ensure it appears above the static */
+            font-size: 20px; /* Adjust size as needed */
+            line-height: 1.2; /* Adjust line height for readability */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="staticCanvas"></canvas>
+    <div id="asciiArt"></div>
+
+    <script>
+        // TV static generation
+        const canvas = document.getElementById('staticCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function generateStatic() {
+            const imageData = ctx.createImageData(canvas.width, canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const randomValue = Math.random() * 50; // Random grayscale value (0-50)
+                data[i] = randomValue;     // Red
+                data[i + 1] = randomValue; // Green
+                data[i + 2] = randomValue; // Blue
+                data[i + 3] = 255;         // Alpha
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function animate() {
+            generateStatic();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            generateStatic(); // Regenerate static on resize
+        });
+
+        resizeCanvas();
+        animate(); // Start the animation loop
+
+        // ASCII art colorization with rainbow colors
+        const asciiArt = `
+ ░▒▓██████▓▒░░▒▓██████████████▓▒░░▒▓███████▓▒░░▒▓█▓▒░░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░ 
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░  
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░  ░▒▓█▓▒░          ░▒▓█▓▒░ 
+░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░  ░▒▓█▓▒░          ░▒▓█▓▒░ 
+ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓███████▓▒░   ░▒▓█▓▒░   ░▒▓███████▓▒░  
+
+        OMNISOPHIA THANKS YOU!
+        Success! You've installed  your lampstack successfully!`;
+
+        const colors = [
+            '#FF0000', '#FF7F00', '#FFFF00', '#7FFF00', 
+            '#00FF00', '#00FF7F', '#00FFFF', '#007FFF', 
+            '#0000FF', '#7F00FF', '#FF00FF', '#FF007F'
+        ]; // Rainbow colors
+
+        function colorizeASCII(ascii) {
+            return ascii.split('').map((char, index) => {
+                if (char === '░') return `<span style="color: ${colors[index % colors.length]}">${char}</span>`;
+                if (char === '▒') return `<span style="color: ${colors[(index + 1) % colors.length]}">${char}</span>`;
+                if (char === '▓') return `<span style="color: ${colors[(index + 2) % colors.length]}">${char}</span>`;
+                if (char === '█') return `<span style="color: ${colors[(index + 3) % colors.length]}">${char}</span>`;
+                return char; // Return uncolored characters
+            }).join('');
+        }
+
+        document.getElementById('asciiArt').innerHTML = colorizeASCII(asciiArt);
+    </script>
+</body>
+</html>
